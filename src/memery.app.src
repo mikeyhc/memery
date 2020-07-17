@@ -1,0 +1,17 @@
+{application, memery,
+ [{description, "Low-tier meme storage"},
+  {vsn, "0.1.0"},
+  {registered, []},
+  {mod, {memery_app, []}},
+  {applications,
+   [kernel,
+    stdlib,
+    cowboy,
+    mnesia
+   ]},
+  {env,[]},
+  {modules, []},
+
+  {licenses, ["The Unlicense"]},
+  {links, []}
+ ]}.
