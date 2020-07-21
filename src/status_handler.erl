@@ -8,4 +8,3 @@ init(Req0, State) ->
                            jsone:encode(#{<<"status">> => <<"ok">>}),
                            Req0),
     {ok, Req, State}.
-
