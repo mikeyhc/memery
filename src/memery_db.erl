@@ -1,5 +1,5 @@
 -module(memery_db).
--export([install/1, store_meme/5, fetch_meme/1, meme_by_name/1]).
+-export([install/1, store_meme/4, fetch_meme/1, meme_by_name/1]).
 
 -include_lib("stdlib/include/ms_transform.hrl").
 
@@ -25,19 +25,15 @@ install(Nodes) ->
     rpc:multicall(Nodes, application, stop, [mnesia]),
     ok.
 
--spec store_meme(string(), string(), [string()], string(), string()) ->
-    string().
-store_meme(Name, Description, Tags, Source, Outpath) ->
-    [Type|_] = lists:reverse(string:split(Source, ".", all)),
+-spec store_meme(string(), string(), [string()], string()) -> string().
+store_meme(Name, Description, Tags, Image) ->
     UUID = uuid:get_v4(),
     SID = uuid:uuid_to_string(UUID),
-    Output = Outpath ++ "/" ++ SID ++ "." ++ Type,
-    {ok, _} = file:copy(Source, Output),
     Meme = #meme{uuid=UUID,
                  name=Name,
                  description=Description,
                  tags=Tags,
-                 path=Output},
+                 path=Image},
     mnesia:activity(transaction, fun() -> mnesia:write(Meme) end),
     SID.
 

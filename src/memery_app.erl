@@ -10,7 +10,10 @@
 -export([start/2, stop/1]).
 
 start(_StartType, _StartArgs) ->
-    Routes = [{'_', [{"/", status_handler, []}]}],
+    State = #{tmp_img_dir => "/tmp"},
+    Routes = [{'_', [{"/", status_handler, []},
+                     {"/meme", store_meme_handler, State}
+                    ]}],
     Dispatch = cowboy_router:compile(Routes),
     {ok, _} = cowboy:start_clear(memery_listener,
                                  [{port, 8080}],
