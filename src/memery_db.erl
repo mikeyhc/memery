@@ -1,9 +1,9 @@
 -module(memery_db).
--export([install/1, store_meme/4, fetch_meme/1, meme_by_name/1]).
+-export([install/1, store_meme/5, fetch_meme/1, meme_by_name/1]).
 
 -include_lib("stdlib/include/ms_transform.hrl").
 
--record(meme, {uuid :: uuid:uuid(),
+-record(meme, {hash :: binary(),
                name :: string(),
                description :: string() | undefined,
                tags :: [string()],
@@ -25,23 +25,20 @@ install(Nodes) ->
     rpc:multicall(Nodes, application, stop, [mnesia]),
     ok.
 
--spec store_meme(string(), string(), [string()], string()) -> string().
-store_meme(Name, Description, Tags, Image) ->
-    UUID = uuid:get_v4(),
-    SID = uuid:uuid_to_string(UUID),
-    Meme = #meme{uuid=UUID,
+-spec store_meme(string(), string(), [string()], string(), binary()) ->
+    string().
+store_meme(Name, Description, Tags, Image, Hash) ->
+    Meme = #meme{hash=Hash,
                  name=Name,
                  description=Description,
                  tags=Tags,
                  path=Image},
     mnesia:activity(transaction, fun() -> mnesia:write(Meme) end),
-    SID.
-
+    Hash.
 
 -spec fetch_meme(string()) -> [maps:map(string(), string() | [string()])].
 fetch_meme(ID) ->
-    UUID = uuid:string_to_uuid(ID),
-    Memes = mnesia:activity(async_dirty, fun() -> mnesia:read(meme, UUID) end),
+    Memes = mnesia:activity(async_dirty, fun() -> mnesia:read(meme, ID) end),
     lists:map(fun record_to_map/1, Memes).
 
 -spec meme_by_name(string()) -> [maps:map(string(), string() | [string()])].
@@ -55,9 +52,9 @@ meme_by_name(Name) ->
 %% Internal Functions
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-record_to_map(#meme{uuid=UUID, name=Name, description=Description, tags=Tags,
+record_to_map(#meme{hash=Hash, name=Name, description=Description, tags=Tags,
                     path=Path}) ->
-    #{uuid => UUID,
+    #{hash => Hash,
       name => Name,
       description => Description,
       tag => Tags,
