@@ -54,9 +54,9 @@ meme_by_name(Name) ->
 
 record_to_map(#meme{hash=Hash, name=Name, description=Description, tags=Tags,
                     path=Path}) ->
-    #{hash => Hash,
-      name => Name,
-      description => Description,
-      tag => Tags,
-      path => Path
+    #{<<"id">> => Hash,
+      <<"name">> => Name,
+      <<"description">> => Description,
+      <<"tags">> => Tags,
+      <<"path">> => Path
      }.

@@ -24,14 +24,15 @@ from_json(Req0, State=#{tmp_img_dir := Dir}) ->
     Image = base64:decode(EncodedImage),
     <<Hash:256>> = crypto:hash(sha256, Image),
     StrHash = io_lib:format("~64.16.0b", [Hash]),
-    case memery_db:fetch_meme(StrHash) of
+    BinHash = binary:list_to_bin(StrHash),
+    case memery_db:fetch_meme(BinHash) of
         [] ->
-            Path = lists:flatten(io_lib:format("~s/~s.~s",
-                                               [Dir, StrHash, Suffix])),
+            StrPath = lists:flatten(io_lib:format("~s/~s.~s",
+                                                  [Dir, StrHash, Suffix])),
+            Path = binary:list_to_bin(StrPath),
             ok = file:write_file(Path, Image),
-            UUID = memery_db:store_meme(Name, Description, Tags, Path, StrHash),
-            Reply = #{<<"status">> => <<"ok">>,
-                      <<"id">> => binary:list_to_bin(UUID)},
+            UUID = memery_db:store_meme(Name, Description, Tags, Path, BinHash),
+            Reply = #{<<"status">> => <<"ok">>, <<"id">> => UUID},
             Headers = #{<<"content-type">> => <<"application/json">>},
             Req2 = cowboy_req:set_resp_body(jsone:encode(Reply), Req1),
             Req = cowboy_req:set_resp_headers(Headers, Req2),
