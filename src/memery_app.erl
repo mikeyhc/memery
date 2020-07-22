@@ -11,8 +11,10 @@
 
 start(_StartType, _StartArgs) ->
     State = #{tmp_img_dir => "/tmp"},
-    Routes = [{'_', [{"/", status_handler, []},
-                     {"/meme", store_meme_handler, State}
+    Routes = [{'_', [{"/api/", status_handler, []},
+                     {"/api/meme", store_meme_handler, State},
+                     {"/api/meme/:meme_id", fetch_meme_handler, State},
+                     {"/meme/[...]", cowboy_static, {dir, "/tmp"}}
                     ]}],
     Dispatch = cowboy_router:compile(Routes),
     {ok, _} = cowboy:start_clear(memery_listener,
