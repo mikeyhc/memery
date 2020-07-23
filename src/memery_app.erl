@@ -14,6 +14,7 @@ start(_StartType, _StartArgs) ->
     Routes = [{'_', [{"/api/", status_handler, []},
                      {"/api/meme", store_meme_handler, State},
                      {"/api/meme/:meme_id", fetch_meme_handler, State},
+                     {"/api/memes", fetch_memes_handler, State},
                      {"/meme/[...]", cowboy_static, {dir, "/tmp"}}
                     ]}],
     Dispatch = cowboy_router:compile(Routes),
