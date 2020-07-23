@@ -1,5 +1,6 @@
 -module(memery_db).
--export([install/1, store_meme/5, fetch_meme/1, meme_by_name/1]).
+-export([install/1, store_meme/5, fetch_meme/1, meme_by_name/1,
+         random_memes/1]).
 
 -include_lib("stdlib/include/ms_transform.hrl").
 
@@ -9,6 +10,8 @@
                tags :: [string()],
                path :: string()
               }).
+
+-type meme_map() :: maps:map(string(), string() | [string()]).
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% API Functions
@@ -36,17 +39,26 @@ store_meme(Name, Description, Tags, Image, Hash) ->
     mnesia:activity(transaction, fun() -> mnesia:write(Meme) end),
     Hash.
 
--spec fetch_meme(string()) -> [maps:map(string(), string() | [string()])].
+-spec fetch_meme(string()) -> [meme_map()].
 fetch_meme(ID) ->
     Memes = mnesia:activity(async_dirty, fun() -> mnesia:read(meme, ID) end),
     lists:map(fun record_to_map/1, Memes).
 
--spec meme_by_name(string()) -> [maps:map(string(), string() | [string()])].
+-spec meme_by_name(string()) -> [meme_map()].
 meme_by_name(Name) ->
     Match = ets:fun2ms(fun(M=#meme{name = N}) when N =:= Name -> M end),
     Select = fun() -> mnesia:select(meme, Match) end,
     Memes = mnesia:activity(async_dirty, Select),
     lists:map(fun record_to_map/1, Memes).
+
+-spec random_memes(integer()) -> [meme_map()].
+random_memes(Limit) ->
+    ReadAll = fun() -> mnesia:foldl(fun(X, Acc) -> [X|Acc] end, [], meme) end,
+    Memes = mnesia:activity(async_dirty, ReadAll),
+    Length = length(Memes),
+    Indexes = lists:map(fun(_) -> rand:uniform(Length) end,
+                        lists:seq(1, Limit)),
+    lists:map(fun(Idx) -> record_to_map(lists:nth(Idx, Memes)) end, Indexes).
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% Internal Functions
