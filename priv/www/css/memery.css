@@ -1,0 +1,26 @@
+#memes {
+    display: flex;
+    flex-wrap: wrap;
+}
+
+.meme-holder {
+    flex: 0 1 21%;
+    margin: 5px;
+    max-height: 300px;
+    max-width: 200px;
+    overflow: hidden;
+}
+
+.meme {
+    max-width: 200px;
+}
+
+.meme-holder figure {
+    width: 100%;
+    margin: auto;
+}
+
+.meme-holder figure figcaption {
+    width: 100%;
+    text-align: center;
+}

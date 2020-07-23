@@ -15,7 +15,11 @@ start(_StartType, _StartArgs) ->
                      {"/api/meme", store_meme_handler, State},
                      {"/api/meme/:meme_id", fetch_meme_handler, State},
                      {"/api/memes", fetch_memes_handler, State},
-                     {"/meme/[...]", cowboy_static, {dir, "/tmp"}}
+
+                     {"/meme/[...]", cowboy_static, {dir, "/tmp"}},
+                     {"/", cowboy_static,
+                      {priv_file, memery, "www/index.html"}},
+                     {"/[...]", cowboy_static, {priv_dir, memery, "www"}}
                     ]}],
     Dispatch = cowboy_router:compile(Routes),
     {ok, _} = cowboy:start_clear(memery_listener,
