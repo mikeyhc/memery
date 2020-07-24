@@ -1,9 +1,31 @@
 function upload() {
-  fr = new FileReader();
+  var fr = new FileReader();
   fr.onload = function() {
-    console.log("loaded file");
-    console.log(fr.result);
-    console.log(document.getElementById("file").files[0].name);
+    /* TODO do some basic validation */
+    name = document.getElementById("name").value;
+    description = document.getElementById("description").value;
+    tags = document.getElementById("tags").value;
+    file = document.getElementById("file").value;
+    data = btoa(this.result);
+    form = {
+      "name": name,
+      "description": description,
+      "tags": tags.split(" "),
+      "filename": file,
+      "data": data
+    }
+    fetch('/api/meme', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(form)
+    })
+    .then(response => response.json())
+    .then(data => alert("SUCCESS!"))
+    .catch((error) => {
+      alert("ERROR!");
+    });
   };
   fr.readAsBinaryString(document.getElementById("file").files[0]);
 }
