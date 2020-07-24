@@ -1,0 +1,33 @@
+<!doctype html>
+
+<html>
+    <head>
+        <title>Memery - Upload Meme</title>
+        <link href="css/memery.css" rel="stylesheet" />
+        <script src="scripts/memery_upload.js"></script>
+
+        <meta charset="UTF-8" />
+    </head>
+
+    <body>
+        <header>
+            <h1>Upload Meme</h1>
+        </header>
+        <section>
+            <label for="name">Name*</label>
+            <input type="text" id="name" name="name" />
+            <label for="description">Description</label>
+            <input type="text" id="description" name="description" />
+            <label for="tags">Tags</label>
+            <input type="text" id="tags" name="tags" />
+            <label for="file">File</label>
+            <input type="file" id="file" name="file" />
+            <input type="button" id="upload" value="Upload"
+             onclick="upload()" />
+        </section>
+        <footer>
+            Sources available on
+            <a href="https://github.com/mikeyhc/memery">Github</a>
+        </footer>
+    </body>
+</html>
